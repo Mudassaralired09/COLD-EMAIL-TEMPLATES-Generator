@@ -2,31 +2,36 @@
 <html lang="ur">
 <head>
     <meta charset="UTF-8">
-    <title>AI ای میل جنریٹر</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کولڈ ای میل جنریٹر</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             background: #f0f2f5;
-            padding: 20px;
+            padding: 15px;
             line-height: 1.6;
+            color: #333;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
             color: #2c3e50;
             text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         textarea {
             width: 100%;
             height: 120px;
             padding: 12px;
-            margin: 15px 0;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
@@ -41,103 +46,108 @@
             border-radius: 5px;
             cursor: pointer;
             display: block;
-            margin: 0 auto;
-            transition: background 0.3s;
+            margin: 0 auto 20px;
+            width: 100%;
         }
-        button:hover {
-            background: #2980b9;
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
         }
         .output-area {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 15px;
             background: #f9f9f9;
             border-radius: 5px;
             border: 1px dashed #3498db;
         }
         #output {
             white-space: pre-wrap;
-            margin-top: 10px;
-            padding: 15px;
+            padding: 10px;
             background: #fff;
             border-radius: 5px;
-            min-height: 100px;
+            min-height: 150px;
         }
         .loading {
-  color: #3498db;
-  text-align: center;
-  padding: 20px;
-  font-size: 18px;
-}
-
-.error {
-  color: #e74c3c;
-  background: #fdecea;
-  padding: 15px;
-  border-radius: 5px;
-  border-left: 4px solid #e74c3c;
-}
-
-.error button {
-  background: #e74c3c;
-  margin-top: 10px;
-}
+            text-align: center;
+            color: #3498db;
+            padding: 10px;
+        }
+        .error {
+            color: #e74c3c;
+            background: #fdecea;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📧 پیشہ ورانہ ای میل جنریٹر</h1>
-        <textarea id="inputText" placeholder="مثلاً: مصنوعات X کی مارکیٹنگ، بجٹ $1000، ٹارگٹ: چھوٹے کاروبار..."></textarea>
-        <button onclick="generateEmail()">ایمیل بنائیں</button>
+        <h1>📧 کولڈ ای میل جنریٹر</h1>
+        
+        <textarea id="inputText" placeholder="مثلاً: 
+- مصنوعات: ویب ڈیزائن سروسز
+- ہدف: چھوٹے کاروبار
+- خاص پیشکش: پہلے مہینے 50% رعایت"></textarea>
+        
+        <button onclick="generateEmail()" id="generateBtn">ایمیل جنریٹ کریں</button>
+        
         <div class="output-area">
             <h3>تیار ایمیل:</h3>
-            <div id="output"></div>
+            <div id="output">معلومات درج کرنے کے بعد "ایمیل جنریٹ کریں" بٹن دبائیں</div>
         </div>
     </div>
 
     <script>
-async function generateEmail() {
-  const userInput = document.getElementById('inputText').value;
-  const outputDiv = document.getElementById('output');
-  
-  // لوڈنگ میسج
-  outputDiv.innerHTML = `<div class="loading">ایمیل تیار ہو رہی ہے... ⏳</div>`;
-  
-  try {
-    const response = await fetch("/api/generateEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: userInput })
-    });
-    
-    // سرور سے جواب چیک کریں
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`API خرابی: ${errorData.error || response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    // نتیجہ ظاہر کریں
-    outputDiv.innerHTML = data.email
-      .replace(/\n/g, "<br>")
-      .replace(/"/g, "");
-      
-  } catch (error) {
-    // تفصیلی خرابی کا پیغام
-    outputDiv.innerHTML = `
-      <div class="error">
-        <b>خرابی:</b> ${error.message}<br>
-        <b>حل:</b> 
-        <ul>
-          <li>Vercel میں COHERE_API_KEY چیک کریں</li>
-          <li>internet کنکشن چیک کریں</li>
-          <li>دوبارہ کوشش کریں</li>
-        </ul>
-        <button onclick="location.reload()">ری لوڈ</button>
-      </div>
-    `;
-  }
-}
-</script>
+        async function generateEmail() {
+            const userInput = document.getElementById('inputText').value;
+            const outputDiv = document.getElementById('output');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // بٹن ڈس ایبل کر دیں
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'تیار ہو رہا ہے...';
+            
+            // لوڈنگ میسج
+            outputDiv.innerHTML = '<div class="loading">ایمیل تیار ہو رہا ہے ⏳<br>10-20 سیکنڈ لگ سکتے ہیں...</div>';
+            
+            try {
+                const response = await fetch("/api/generateEmail", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: userInput })
+                });
+                
+                // جواب چیک کریں
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `API خرابی: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // نتیجہ ظاہر کریں
+                outputDiv.innerHTML = data.email
+                    .replace(/\n/g, "<br>")
+                    .replace(/"/g, "");
+                
+            } catch (error) {
+                // خرابی کا پیغام
+                outputDiv.innerHTML = `<div class="error">
+                    <strong>خرابی:</strong> ${error.message}<br><br>
+                    <strong>حل:</strong>
+                    <ul>
+                        <li>Vercel میں COHERE_API_KEY چیک کریں</li>
+                        <li>کوئی غلطی ہو تو مجھے دوبارہ پیغام بھیجیں</li>
+                    </ul>
+                </div>`;
+            } finally {
+                // بٹن کو دوبارہ فعال کریں
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'ایمیل جنریٹ کریں';
+            }
+        }
+    </script>
 </body>
 </html>
