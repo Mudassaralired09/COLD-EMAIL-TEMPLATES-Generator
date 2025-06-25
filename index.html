@@ -76,29 +76,49 @@
     </div>
 
     <script>
-        async function generateEmail() {
-            const userInput = document.getElementById('inputText').value;
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = "<div style='color: #3498db; text-align: center;'>ایمیل تیار ہو رہی ہے... ⏳</div>";
-            
-            try {
-                const response = await fetch("/api/generateEmail", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt: userInput })
-                });
-
-                const data = await response.json();
-                outputDiv.innerHTML = data.email
-                    .replace(/\n/g, "<br>")
-                    .replace(/"/g, "");
-            } catch (error) {
-                outputDiv.innerHTML = `<div style="color: red;">
-                    خرابی: ${error.message}<br>
-                    ٹپ: Vercel پر API کا لنک چیک کریں
-                </div>`;
-            }
-        }
-    </script>
+async function generateEmail() {
+  const userInput = document.getElementById('inputText').value;
+  const outputDiv = document.getElementById('output');
+  
+  // لوڈنگ میسج
+  outputDiv.innerHTML = `<div class="loading">ایمیل تیار ہو رہی ہے... ⏳</div>`;
+  
+  try {
+    const response = await fetch("/api/generateEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: userInput })
+    });
+    
+    // سرور سے جواب چیک کریں
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`API خرابی: ${errorData.error || response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // نتیجہ ظاہر کریں
+    outputDiv.innerHTML = data.email
+      .replace(/\n/g, "<br>")
+      .replace(/"/g, "");
+      
+  } catch (error) {
+    // تفصیلی خرابی کا پیغام
+    outputDiv.innerHTML = `
+      <div class="error">
+        <b>خرابی:</b> ${error.message}<br>
+        <b>حل:</b> 
+        <ul>
+          <li>Vercel میں COHERE_API_KEY چیک کریں</li>
+          <li>internet کنکشن چیک کریں</li>
+          <li>دوبارہ کوشش کریں</li>
+        </ul>
+        <button onclick="location.reload()">ری لوڈ</button>
+      </div>
+    `;
+  }
+}
+</script>
 </body>
 </html>
