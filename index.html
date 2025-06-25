@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <title>AI ای میل جنریٹر</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .output-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px dashed #3498db;
+        }
+        #output {
+            white-space: pre-wrap;
+            margin-top: 10px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 پیشہ ورانہ ای میل جنریٹر</h1>
+        <textarea id="inputText" placeholder="مثلاً: مصنوعات X کی مارکیٹنگ، بجٹ $1000، ٹارگٹ: چھوٹے کاروبار..."></textarea>
+        <button onclick="generateEmail()">ایمیل بنائیں</button>
+        <div class="output-area">
+            <h3>تیار ایمیل:</h3>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <script>
+        async function generateEmail() {
+            const userInput = document.getElementById('inputText').value;
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = "<div style='color: #3498db; text-align: center;'>ایمیل تیار ہو رہی ہے... ⏳</div>";
+            
+            try {
+                const response = await fetch("/api/generateEmail", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: userInput })
+                });
+
+                const data = await response.json();
+                outputDiv.innerHTML = data.email
+                    .replace(/\n/g, "<br>")
+                    .replace(/"/g, "");
+            } catch (error) {
+                outputDiv.innerHTML = `<div style="color: red;">
+                    خرابی: ${error.message}<br>
+                    ٹپ: Vercel پر API کا لنک چیک کریں
+                </div>`;
+            }
+        }
+    </script>
+</body>
+</html>
