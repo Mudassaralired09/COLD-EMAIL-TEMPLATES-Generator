@@ -1,0 +1,14 @@
+{
+  "routes": [
+    {
+      "src": "/api/generateEmail",
+      "dest": "/api/generateEmail.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ]
+}
